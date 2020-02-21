@@ -43,3 +43,10 @@ func WriteError(ctx context.Context, w http.ResponseWriter, statusCode int, para
 	w.Write([]byte(desc))
 	w.Write([]byte("\"}"))
 }
+
+func WriteMethodNotAllowed(ctx context.Context, w http.ResponseWriter) {
+	if ctx.Err() != nil {
+		return
+	}
+	w.WriteHeader(http.StatusMethodNotAllowed)
+}
