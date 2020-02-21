@@ -20,7 +20,7 @@ func WriteSuccess(ctx context.Context, w http.ResponseWriter, data interface{}) 
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("{\"data\": "))
+	w.Write([]byte("{\"data\":"))
 	w.Write(val)
 	w.Write([]byte("}"))
 }
@@ -39,7 +39,7 @@ func WriteError(ctx context.Context, w http.ResponseWriter, statusCode int, para
 	}
 
 	w.WriteHeader(statusCode)
-	w.Write([]byte("{\"error\": true, \"desc\": \""))
+	w.Write([]byte("{\"error\":true,\"desc\":\""))
 	w.Write([]byte(desc))
 	w.Write([]byte("\"}"))
 }

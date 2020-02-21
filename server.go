@@ -51,17 +51,11 @@ func Start() {
 }
 
 func Stop() {
-	log.Println("Shutting down the server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-
 	Srv.Shutdown(ctx)
-
-	log.Println("Cleaning up resources...")
 	CtxCancel()
-
-	log.Println("Closing database pool...")
-	DbPool.Close()
-
-	log.Println("Goodbye!")
+	if DbPool != nil {
+		DbPool.Close()
+	}
 }
