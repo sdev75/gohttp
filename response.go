@@ -1,56 +1,45 @@
 package gohttp
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
-type ResponseWriter struct {
-	w   http.ResponseWriter
-	r   *http.Request
-	buf strings.Builder
-}
+func WriteSuccess(ctx context.Context, w http.ResponseWriter, data interface{}) {
+	if ctx.Err() != nil {
+		return
+	}
 
-func (r *ResponseWriter) Success(data interface{}) {
-
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	val, err := json.Marshal(data)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	select {
-	case <-r.r.Context().Done():
-		return
-	default:
-		r.w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		r.w.WriteHeader(http.StatusOK)
-		res := fmt.Sprintf("{\"data\": %s}", val)
-		r.w.Write([]byte(res))
-	}
-
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("{\"data\": "))
+	w.Write(val)
+	w.Write([]byte("}"))
 }
 
-func (r *ResponseWriter) Error(code int, params ...string) {
+func WriteError(ctx context.Context, w http.ResponseWriter, statusCode int, params ...string) {
+	if ctx.Err() != nil {
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	var desc string
 	if len(params) == 0 {
-		desc = http.StatusText(code)
+		desc = http.StatusText(statusCode)
 	} else {
 		desc = params[0]
 	}
-	select {
-	case <-r.r.Context().Done():
-		return
-	default:
-		r.w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		r.w.WriteHeader(code)
-		res := fmt.Sprintf("{\"error\": true, \"code\": %d, \"desc\": \"%s\"}",
-			code, strconv.Quote(desc))
-		r.w.Write([]byte(res))
-	}
 
+	w.WriteHeader(statusCode)
+	w.Write([]byte("{\"error\": true, \"desc\": \""))
+	w.Write([]byte(desc))
+	w.Write([]byte("\"}"))
 }
