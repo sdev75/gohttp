@@ -11,15 +11,15 @@ import (
 	"time"
 )
 
-func Init(cfg Config, pool *sql.DB) *http.Server {
+func Init(handler http.Handler, cfg Config, pool *sql.DB) *http.Server {
 	Ctx, CtxCancel = context.WithCancel(context.Background())
 	Srv = &http.Server{
 		Addr:              cfg.Addr,
-		ReadTimeout:       time.Second * 5,
-		ReadHeaderTimeout: time.Second * 5,
-		WriteTimeout:      time.Second * 30,
-		IdleTimeout:       time.Second * 30,
-		Handler:           cfg.Handler,
+		ReadTimeout:       cfg.ReadTimeout,
+		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
+		WriteTimeout:      cfg.WriteTimeout,
+		IdleTimeout:       cfg.IdleTimeout,
+		Handler:           handler,
 	}
 
 	DbPool = pool
