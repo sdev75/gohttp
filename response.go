@@ -20,7 +20,7 @@ func WriteSuccess(ctx context.Context, w http.ResponseWriter, data interface{}) 
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("{\"data\":"))
+	w.Write([]byte("{"))
 	w.Write(val)
 	w.Write([]byte("}"))
 }
