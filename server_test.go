@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+	"os"
 )
 
 var (
@@ -18,6 +19,17 @@ var (
 	router = NewSimpleRouter()
 )
 
+func TestMain(m *testing.M) {
+	Init(router, cfg, nil)
+	go Start()
+	defer func(){
+		Stop()
+	}()
+	
+   	ret := m.Run()
+	os.Exit(ret)
+}
+
 func TestServer(t *testing.T) {
 
 	router.Match = func(w http.ResponseWriter, r *http.Request) *SimpleRouterMatch {
@@ -27,10 +39,6 @@ func TestServer(t *testing.T) {
 		}
 		return res
 	}
-
-	Init(router, cfg, nil)
-	go Start()
-	defer Stop()
 
 	req, err := http.NewRequest("GET", "*", nil)
 	if err != nil {
@@ -61,10 +69,6 @@ func TestServeStaticFile(t *testing.T) {
 		res.Handler = http.FileServer(http.Dir("./public")).ServeHTTP
 		return res
 	}
-
-	Init(router, cfg, nil)
-	go Start()
-	defer Stop()
 
 	req, err := http.NewRequest("GET", "static.txt", nil)
 	if err != nil {
